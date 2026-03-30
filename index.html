@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Французский тренажёр</title>
+
+    <link rel="stylesheet" href="style.css">
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2193b0">
+</head>
+<body>
+
+<div class="card">
+
+    <!-- ТАБЫ -->
+    <div class="tabs">
+        <button class="tab active" onclick="switchTab('phonetics', this)">Фонетика</button>
+        <button class="tab" onclick="switchTab('grammar', this)">Грамматика</button>
+    </div>
+
+    <!-- ФОНЕТИКА -->
+    <div id="phoneticsSection">
+        <button class="btn-rules" onclick="toggleModal(true)">📖 Правила</button>
+        <h1>🇫🇷 Фонетика</h1>
+
+        <div class="btn-group">
+            <button onclick="getRandomWord()">Следующее слово</button>
+            <button id="hlBtn" onclick="toggleHighlightMode()">Подсветка</button>
+        </div>
+
+        <div class="word-container">
+            <div id="word" class="word"></div>
+            <div id="speaker" onclick="speakWord()">🔊</div>
+        </div>
+
+        <div id="translation"></div>
+        <button id="showBtn" onclick="showTranscription()">Показать транскрипцию</button>
+        <div id="transcription"></div>
+    </div>
+
+    <!-- ГРАММАТИКА -->
+<div id="grammarSection" style="display:none;">
+
+  <!-- Кнопка правил -->
+    <button class="btn-rules" onclick="toggleGrammarRules(true)">📖 Правила</button>
+
+    <h1>🇫🇷 Глаголы</h1>
+
+    <!-- Вкладки групп -->
+    <div class="tabs">
+        <button class="tab active" onclick="setGroup('all', this)">Все</button>
+        <button class="tab" onclick="setGroup('er', this)">-er</button>
+        <button class="tab" onclick="setGroup('ir', this)">-ir</button>
+        <button class="tab" onclick="setGroup('irr', this)">-⚡</button>
+    </div>
+
+<!-- Вкладки времён -->
+<div class="tabs">
+    <button class="tab active" onclick="setTense('present', this)">Настоящее</button>
+    <button class="tab" onclick="setTense('past', this)">Прошедшее</button>
+    <button class="tab" onclick="setTense('future', this)">Будущее</button>
+</div>
+
+    <button onclick="getVerb()">Новый глагол</button>
+
+    <div id="verb" style="margin:15px; font-size:22px;"></div>
+
+    <div id="inputs"></div>
+
+    <button onclick="checkVerb()">Проверить</button>
+    <button onclick="showAnswer()">Показать ответ</button>
+
+    <div id="result"></div>
+
+</div> <div id="grammarRulesModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="toggleGrammarRules(false)">&times;</span>
+
+        <h2>📜 Общие правила</h2>
+        <div class="rule-item">
+            Во французском есть 3 основные группы глаголов: <b>-er, -ir, -re</b>.
+        </div>
+
+        <h2>📘 Группа -er</h2>
+        <div class="rule-item">
+            Самая простая группа. Основа = инфинитив без <code>-er</code>.
+            Окончания: <b>e, es, e, ons, ez, ent</b>
+        </div>
+
+        <h2>📗 Группа -ir</h2>
+        <div class="rule-item">
+            Добавляется <code>-iss</code> во множественном числе.
+            Окончания: <b>is, is, it, issons, issez, issent</b>
+        </div>
+
+        <h2>📙 Группа -re</h2>
+        <div class="rule-item">
+            У <b>il/elle</b> нет окончания.
+            Окончания: <b>s, s, –, ons, ez, ent</b>
+        </div>
+
+    </div>
+</div>
+
+<div id="phoneticsSection">
+    </div>
+
+<div id="grammarSection" style="display:none;">
+    </div>
+
+<div id="rulesModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="toggleModal(false)">&times;</span>
+        
+        <div class="rule-section">
+   
+<h2>📜 Общие правила</h2>
+            <div class="rule-item">Если слово оканчивается на звук <code>:r :v :z :ʒ</code>, то чаще всего гласный перед ним удлиняется.</div>
+            <div class="rule-item"><code>er, ez</code> — читаются как <b>é [e]</b>. <code>ent</code> и <code>es</code> (в глаголах) обычно <b>не читается</b>. В конце слова согласные обычно <b>не читаются</b> (кроме: <code>c, r, f, l</code> — <span class="accent-text">CaReFuL</span>).</div>
+            <div class="rule-item"><b>Связки (Liaison):</b> Конечная согласная может читаться, если следующее слово начинается с гласной. Если согласная произносится, она «переходит» к следующему слову.</div>
+            <div class="rule-item">Если после <code>n/m</code> идёт гласная, <b>носовой звук пропадает</b>.</div>
+            <div class="rule-item">Ударение почти всегда на <b>последний слог</b>. Все гласные произносятся чётко. Буква <code>h</code> всегда немая.</div>
+        </div>
+
+        <div class="rule-section">
+            <h2>🍎 Гласные и дифтонги</h2>
+            <div class="rule-item"><b>a</b> (<code>a, â, emm, enn</code>) - обычное "а", рот открыт, без напряжения</div>
+            <div class="rule-item"><b>e</b> (<code>é, er, es, ez</code>) – похож на <i>е</i> в слове <i>шель, цель</i> (с улыбкой).</div>
+            <div class="rule-item"><b>ɛ</b> (<code>è, ê, ai, ei, e-в закр. слоге</code>) – похож на <i>э</i> в слове <i>этот</i>. Без улыбки, челюсть вниз. Буква <b>е</b> читается как <b>ɛ</b> в слоге на согласный и в <code>et</code> на конце слов.</div>
+            <div class="rule-item"><b>œ</b> (<code>eu, œ</code>) – перед согласными (кроме <code>z</code>). Сказать <i>э</i>, не меняя язык, округлить губы расслабленно.</div>
+            <div class="rule-item"><b>ø</b> (<code>eu, œu</code>) – на конце слов и перед <code>z</code>. Сказать <i>е</i> (цель), не меняя язык, округлить губы напряженно.</div>
+            <div class="rule-item"><b>ə</b> (<code>е</code>) – в коротких словах (le, me) или в конце (почти не слышно). Между «э» и «ё», максимально редуцировано.</div>
+            <div class="rule-item"><b>ɔ</b> (<code>o</code>) – перед согласными (кроме <code>z</code>). Произнести <i>о</i>, не вытягивая губы («дыхнуть на      стекло»).</div>
+            <div class="rule-item"><b>o</b> (<code>o, ô, au, eau</code>) – на конце слов, перед непроизносимой согласной или <code>z</code>. 
+⚠️ <i>Исключения (ɔ): hotel, hospital, Paul, mauvais(e).</i></div>
+            <div class="rule-item"><b>у</b> (<code>u</code>) – сказать «и», не двигая язык, округлить губы для «у».</div>
+            <div class="rule-item"><b>ɥ</b> (<code>ui, ue, ua, ueu</code>) – тот же звук <b>у</b>, произнесенный предельно кратко.</div>
+            <div class="rule-item"><b>u</b> (<code>ou</code>) – <i>у</i> (мумия), сильнее округлять и выдвигать вперед губы.</div>
+            <div class="rule-item"><b>w</b> (<code>oi [wa], oin [wɛ̃], ou + гласный</code>) – звук <b>u</b>, произнесенный кратко перед гласным.</div>
+            <div class="rule-item"><b>l</b> (L) – язык касается верхних десен, без улыбки. <b>i/y</b> – как в слове "нить", с улыбкой.</div>
+            <div class="rule-item"><b>j</b> (<code>ill, il-после гласной, i-перед гласной</code>) – <i>й</i> (ямы). 
+⚠️ <i>Исключения: mille, ville, Lille (читается как "ль").</i></div>
+        </div>
+
+        <div class="rule-section">
+            <h2>⚡ Согласные</h2>
+            <div class="rule-item"><b>s</b> (<code>с, s, ç</code>) – <b>c</b> как <i>s</i> перед <code>e, i, y</code>, иначе <i>k</i>. Буква <b>ç</b> — всегда <i>s</i>. Между гласными <b>s</b> → <i>z</i>.</div>
+            <div class="rule-item"><b>k</b> (<code>с, qu, k, x</code>). Буква <b>u</b> не читается после <b>q</b>. Буква <b>х</b> как <i>кс</i> (между гласными — <i>гз</i>).</div>
+            <div class="rule-item"><b>g</b> (<code>g, gu</code>) – <i>г</i>, кроме <b>g</b> + <code>e, i, y</code> (тогда как <i>ж</i> — <b>ʒ</b>). Буква <b>u</b> после <b>g</b> не читается.</div>
+            <div class="rule-item"><b>ʃ</b> (<code>Ch</code>) – <i>ш</i>. Исключения: <i>technique</i>. Буквы <code>ph</code> – <i>ф</i>.</div>
+        </div>
+
+        <div class="rule-section">
+            <h2>👃 Носовые</h2>
+            <div class="rule-item"><b>ɑ̃</b> (<code>an, am, en, em</code>) – сказать а и направить часть воздуха в нос. D  конце слога или перед любой согласной, кроме <code>m, n</code>.</div>
+		<div class="rule-item"><b>ɛ̃</b> (<code>in, im, ain, aim, ein</code>) – мычание с открытым ртом + <i>ɛ</i>.</div>
+            <div class="rule-item"><b>œ̃</b> (<code>un, um</code>) – мычать открытым ртом, произнося <i>œ</i>.</div>
+            <div class="rule-item"><b>ɔ̃</b> (<code>on, om</code>) – мычать открытрым ртом, произнося <i>ɔ</i>.</div>
+                       <div class="rule-item"><b>ɲ</b> (<code>gn</code>) – как в слове «осенью». <b>Ien</b> → <i></div>
+</div>
+
+   <script src="phonetics.js"></script>
+    <script src="grammar.js"></script>
+
+    <script>
+    function switchTab(tab, el) {
+        document.getElementById("phoneticsSection").style.display = tab === 'phonetics' ? 'block' : 'none';
+        document.getElementById("grammarSection").style.display = tab === 'grammar' ? 'block' : 'none';
+        document.querySelectorAll(".tab").forEach(btn => btn.classList.remove("active"));
+        el.classList.add("active");
+    }
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
+}
+</script>
+
+</body>
+</html>
