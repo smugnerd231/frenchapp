@@ -6,6 +6,9 @@
     <title>Французский тренажёр</title>
 
     <link rel="stylesheet" href="style.css">
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2193b0">
 </head>
 <body>
 
@@ -168,6 +171,12 @@
         document.querySelectorAll(".tab").forEach(btn => btn.classList.remove("active"));
         el.classList.add("active");
     }
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
+}
 </script>
 
 </body>
