@@ -182,6 +182,14 @@ function toggleHighlightMode() {
     btn.innerText = isHighlightMode ? "Подсветка: Вкл" : "Подсветка: Выкл";
     btn.classList.toggle('active', isHighlightMode);
     if (current) renderWord();
+
+  highlightMode = !highlightMode;
+
+    document.getElementById("hlBtn").classList.toggle("active");
+
+    if (highlightMode) {
+        showTranscription(); // 🔥 авто-показ
+    }
 }
 
 function renderWord() {
@@ -237,3 +245,4 @@ window.onclick = function(e) {
     }
 }
 
+input.classList.add("correct");

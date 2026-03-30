@@ -29,7 +29,7 @@
         <h1>🇫🇷 Фонетика</h1>
 
         <div class="btn-group">
-            <button onclick="getRandomWord()">Следующее слово</button>
+            <button onclick="getRandomWord()">Новое слово</button>
             <button id="hlBtn" onclick="toggleHighlightMode()">Подсветка</button>
         </div>
 
@@ -66,14 +66,17 @@
     <button class="tab" onclick="setTense('future', this)">Будущее</button>
 </div>
 
+<button onclick="toggleMode()">Сменить режим</button>
     <button onclick="getVerb()">Новый глагол</button>
 
-    <div id="verb" style="margin:15px; font-size:22px;"></div>
+<div id="verbContainer">
+    <div id="verb"></div>
+    <div id="verbSpeaker" onclick="speakVerb()">🔊</div>
+</div>    <div id="verb" style="margin:15px; font-size:22px;"></div>
 
     <div id="inputs"></div>
 
-    <button onclick="checkVerb()">Проверить</button>
-    <button onclick="showAnswer()">Показать ответ</button>
+<button id="showBtnGrammar" onclick="showAnswer()">Показать ответ</button>
 
     <div id="result"></div>
 
@@ -81,37 +84,57 @@
         <div class="modal-content">
             <span class="close-modal" onclick="toggleGrammarRules(false)">&times;</span>
 
-        <h2>📜 Общие правила</h2>
-        <div class="rule-item">
-            Во французском есть 3 основные группы глаголов: <b>-er, -ir, -re</b>.
-        </div>
+      <h2>📜 Группы глаголов (Présent)</h2>
+<div class="rule-item">
+    <b>1️⃣ Группа (-er):</b> Основа + <code>e, es, e, ons, ez, ent</code>. 
 
-        <h2>📘 Группа -er</h2>
-        <div class="rule-item">
-            Самая простая группа. Основа = инфинитив без <code>-er</code>.
-            Окончания: <b>e, es, e, ons, ez, ent</b>
-        </div>
+    <i>Пример: parler → je parle.</i>
+</div>
 
-        <h2>📗 Группа -ir</h2>
-        <div class="rule-item">
-            Добавляется <code>-iss</code> во множественном числе.
-            Окончания: <b>is, is, it, issons, issez, issent</b>
-        </div>
+<div class="rule-item">
+    <b>2️⃣ Группа (-ir):</b> Основа + <code>is, is, it, issons, issez, issent</code>. 
 
-        <h2>📙 Группа -re</h2>
-        <div class="rule-item">
-            У <b>il/elle</b> нет окончания.
-            Окончания: <b>s, s, –, ons, ez, ent</b>
-        </div>
+    <i>Характерный суффикс <b>-iss-</b> во множественном числе.</i>
+</div>
+
+<div class="rule-item">
+    <b>3️⃣ Группа (-re / irr):</b> Самая сложная. Чаще всего: <code>s, s, (—), ons, ez, ent</code>. 
+
+    <i>Глаголы типа être, avoir, aller — учим отдельно ⚡</i>
+</div>
+
+<h2>⏳ Времена (Les Temps)</h2>
+
+<div class="rule-item">
+    <b>🟢 Настоящее (Présent):</b> Происходит сейчас. Используем стандартные окончания групп выше.
+</div>
+
+<div class="rule-item">
+    <b>🔵 Прошедшее (Passé Composé):</b> 
+
+    Схема: <code>Avoir/Être</code> + <code>Participe Passé</code>. 
+
+    • <b>-er</b> → <b>-é</b> (parlé) 
+
+    • <b>-ir</b> → <b>-i</b> (fini) 
+
+    • <b>-re</b> → <b>-u</b> (vendu)
+</div>
+
+<div class="rule-item">
+    <b>🟡 Будущее (Futur Simple):</b> 
+
+    Схема: <code>Инфинитив</code> + <code>ai, as, a, ons, ez, ont</code>. 
+
+    <i>У глаголов на <b>-re</b> перед окончанием убираем букву <b>e</b> (vendre → vendr-ai).</i>
+</div>
+
+<div class="rule-item">
+    <b>💡Voila </b> Окончания Будущего времени (Futur) в единственном числе точно такие же, как формы глагола <b>Avoir</b> в настоящем.
+</div>
 
     </div>
 </div>
-
-<div id="phoneticsSection">
-    </div>
-
-<div id="grammarSection" style="display:none;">
-    </div>
 
 <div id="rulesModal" class="modal">
     <div class="modal-content">

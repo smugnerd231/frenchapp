@@ -56,6 +56,18 @@ const irregularVerbs = [
 }
 ];
 
+const translations = {
+    parler: "говорить",
+    aimer: "любить",
+    finir: "заканчивать",
+    choisir: "выбирать",
+    être: "быть",
+    avoir: "иметь",
+    aller: "идти",
+    faire: "делать",
+    venir: "приходить"
+};
+
 let currentVerb = null;
 
 let currentTense = "present";
@@ -88,6 +100,17 @@ function pastParticiple(verb, group) {
     if (group === "re") return base + "u";
 
     return "???"; // неправильные
+}
+
+let mode = "input"; // input | view
+
+function toggleMode() {
+   mode = mode === "input" ? "view" : "input";
+
+    document.getElementById("showBtnGrammar").style.display =
+        mode === "input" ? "block" : "none";
+
+    getVerb();
 }
 
 // ОКОНЧАНИЯ
@@ -133,34 +156,80 @@ function getVerb() {
         return;
     }
 
-    currentVerb = pool[Math.floor(Math.random() * pool.length)];
+   currentVerb = pool[Math.floor(Math.random() * pool.length)];
+currentVerb.group = currentVerb.group || detectGroup(currentVerb.inf);
 
-    document.getElementById("verb").innerText =
-        currentVerb.present
-            ? `${currentVerb.inf} ⚡`
-            : `${currentVerb.inf} (-${currentVerb.group})`;
+const tr = translations[currentVerb.inf] || "";
 
-    const container = document.getElementById("inputs");
-    container.innerHTML = "";
+document.getElementById("verb").innerHTML = `
+    <div style="font-size:24px">${currentVerb.inf}</div>
+    <div style="font-size:14px; color:#777">${tr}</div>
+`;
+document.getElementById("verbSpeaker").style.display = "block";
 
-    pronouns.forEach(p => {
-        container.innerHTML += `
-            <div>
-                ${p} <input id="${p}">
-            </div>
-        `;
-    });
+ const container = document.getElementById("inputs");
 
-    document.getElementById("result").innerHTML = "";
-    answerVisible = false;
+container.innerHTML = `
+    <div class="columns">
+        <div class="col" id="col-left"></div>
+        <div class="col" id="col-right"></div>
+    </div>
+`;
+
+ pronouns.forEach((p, i) => {
+    const target = i < 3 ? "col-left" : "col-right";
+
+    const html = mode === "input"
+        ? `${p} <input id="${p}">`
+        : `${p} <span class="answer">${buildForm(currentVerb.inf, currentVerb.group, i, true)}</span>`;
+
+    document.getElementById(target).innerHTML += `<div>${html}</div>`;
+});
 }
 
+function switchTab(tab, el) {
+    document.getElementById("phoneticsSection").style.display =
+        tab === 'phonetics' ? 'block' : 'none';
+
+    document.getElementById("grammarSection").style.display =
+        tab === 'grammar' ? 'block' : 'none';
+
+    // ❗ только верхние табы
+document.querySelectorAll(".card > .tabs .tab")
+    .forEach(btn => btn.classList.remove("active"));
+
+    el.classList.add("active");
+
+    if (tab === "grammar") {
+
+        currentGroup = "all";
+        currentTense = "present";
+
+        // группы
+        document.querySelectorAll("#grammarSection .tabs")[0]
+            .querySelectorAll(".tab")
+            .forEach(btn => btn.classList.remove("active"));
+
+        document.querySelectorAll("#grammarSection .tabs")[0]
+            .children[0].classList.add("active");
+
+        // времена
+        document.querySelectorAll("#grammarSection .tabs")[1]
+            .querySelectorAll(".tab")
+            .forEach(btn => btn.classList.remove("active"));
+
+        document.querySelectorAll("#grammarSection .tabs")[1]
+            .children[0].classList.add("active");
+
+        getVerb();
+    }
+}
 
 // СОЗДАНИЕ ПРАВИЛЬНОЙ ФОРМЫ
 function buildForm(verb, group, index, highlight = false) {
 
     // ⚡ НЕПРАВИЛЬНЫЕ
-    if (currentVerb.present) {
+    if (currentVerb.present !== undefined) {
 
     let form;
 
@@ -210,6 +279,7 @@ function buildForm(verb, group, index, highlight = false) {
 
 // ПРОВЕРКА
 function checkVerb() {
+    if (mode === "view") return; // ⛔ блокируем
     let correctCount = 0;
 
     pronouns.forEach((p, i) => {
@@ -235,18 +305,34 @@ function checkVerb() {
 // ПОКАЗАТЬ ОТВЕТ
 function showAnswer() {
 
+    if (mode !== "input") return;
+
     if (!answerVisible) {
-        // ПОКАЗАТЬ
+
         pronouns.forEach((p, i) => {
             const input = document.getElementById(p);
-            input.value = buildForm(currentVerb.inf, currentVerb.group, i);
-            input.style.background = "#e0f7fa";
+            const user = input.value.trim().toLowerCase();
+            const correct = buildForm(currentVerb.inf, currentVerb.group, i);
+
+            if (user === "") {
+                input.value = correct;
+                input.style.background = "";
+            }
+            else if (user === correct) {
+                input.value = correct;
+                input.style.background = "#b8f5b8";
+            }
+            else {
+                input.value = correct;
+                input.style.background = "#f5b8b8";
+            }
         });
 
         answerVisible = true;
 
     } else {
-        // СКРЫТЬ
+        // 🔁 вернуть обратно
+
         pronouns.forEach((p) => {
             const input = document.getElementById(p);
             input.value = "";
@@ -261,4 +347,8 @@ function toggleGrammarRules(show) {
     document.getElementById('grammarRulesModal').style.display = show ? 'block' : 'none';
 }
 
-
+function speakVerb() {
+    const utterance = new SpeechSynthesisUtterance(currentVerb.inf);
+    utterance.lang = "fr-FR";
+    speechSynthesis.speak(utterance);
+}
