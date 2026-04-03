@@ -345,15 +345,15 @@ function pastParticiple(verb, group) {
     return "???"; // неправильные
 }
 
-let mode = "input"; // input | view
+let grammarMode = "input"; // input | view
 
-function toggleMode() {
-   mode = mode === "input" ? "view" : "input";
+function toggleGrammarMode() {
+   grammarMode = grammarMode === "input" ? "view" : "input";
 
-    document.getElementById("showBtnGrammar").style.display =
-        mode === "input" ? "block" : "none";
+   document.getElementById("showBtnGrammar").style.display =
+        grammarMode === "input" ? "block" : "none";
 
-    getVerb();
+   getVerb();
 }
 
 // ОКОНЧАНИЯ
@@ -422,7 +422,7 @@ container.innerHTML = `
  pronouns.forEach((p, i) => {
     const target = i < 3 ? "col-left" : "col-right";
 
-    const html = mode === "input"
+    const html = grammarMode === "input"
         ? `${p} <input id="${p}">`
         : `${p} <span class="answer">${buildForm(currentVerb.inf, currentVerb.group, i, true)}</span>`;
 
@@ -522,7 +522,7 @@ function buildForm(verb, group, index, highlight = false) {
 
 // ПРОВЕРКА
 function checkVerb() {
-    if (mode === "view") return; // ⛔ блокируем
+    if (grammarMode === "view") return; // ⛔ блокируем
     let correctCount = 0;
 
     pronouns.forEach((p, i) => {
@@ -548,7 +548,7 @@ function checkVerb() {
 // ПОКАЗАТЬ ОТВЕТ
 function showAnswer() {
 
-    if (mode !== "input") return;
+    if (grammarMode !== "input") return;
 
     if (!answerVisible) {
 

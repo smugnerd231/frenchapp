@@ -171,41 +171,112 @@ const phoneticRules = [
     { p: 'eu', s: '' }, { p: 'œu', s: '' }, { p: 'œ', s: '' }
 ];
 
+const sentences = [
+    {
+        word: "bonjour, comment ça va",
+        translation: "здравствуйте, как дела",
+        transcription: "[bɔ̃ʒuʁ kɔmɑ̃ sa va]"
+    },
+    {
+        word: "je suis étudiant",
+        translation: "я студент",
+        transcription: "[ʒə sɥi etydjɑ̃]"
+    }
+];
+
+let settings = {
+    showTranslation: true,
+    autoTranscription: false,
+    autoHighlight: false,
+    filterSound: null
+};
+
+let mode = 'words'; // words | sentences
+
 let current = null;
 let isHighlightMode = false;
 
 function toggleModal(show) { document.getElementById('rulesModal').style.display = show ? 'block' : 'none'; }
 
-function toggleHighlightMode() {
+function toggleLearningMode() {
     isHighlightMode = !isHighlightMode;
-    const btn = document.getElementById('hlBtn');
-    btn.innerText = isHighlightMode ? "Подсветка: Вкл" : "Подсветка: Выкл";
-    btn.classList.toggle('active', isHighlightMode);
-    if (current) renderWord();
 
-  highlightMode = !highlightMode;
+    const btn = document.getElementById("hlBtn");
 
-    document.getElementById("hlBtn").classList.toggle("active");
-
-    if (highlightMode) {
-        showTranscription(); // 🔥 авто-показ
+    if (isHighlightMode) {
+        btn.innerText = "Скрыть";
+        document.getElementById("transcription").innerText = current.transcription;
+    } else {
+        btn.innerText = "Транскрипция";
+        document.getElementById("transcription").innerText = "";
     }
+
+    renderWord();
 }
 
-function renderWord() {
+
+function getRandomWord() {
+    let source = mode === 'words' ? words : sentences;
+
+    // фильтр
+    if (settings.filterSound) {
+        source = source.filter(item =>
+            item.transcription && item.transcription.includes(settings.filterSound)
+        );
+    }
+
+    // если ничего не найдено
+    if (source.length === 0) {
+    document.getElementById("word").innerText = "⚠️ Нет совпадений";
+    document.getElementById("translation").innerText = "";
+    document.getElementById("transcription").innerText = "";
+    return;
+}
+
+    current = source[Math.floor(Math.random() * source.length)];
+
+    renderWord();
+
+    const translationEl = document.getElementById("translation");
+    translationEl.innerText = current.translation;
+    translationEl.style.display = settings.showTranslation ? "block" : "none";
+
+    const transcriptionEl = document.getElementById("transcription");
+
+    if (settings.autoTranscription) {
+        transcriptionEl.innerText = current.transcription;
+    } else {
+        transcriptionEl.innerText = "";
+    }
+
+
+    document.getElementById("speaker").style.display = "inline-block";
+}
+
+    function renderWord() {
     const wordEl = document.getElementById("word");
-    if (!isHighlightMode) { wordEl.innerText = current.word; return; }
+
+    if (!current) return;
+
+    if (!isHighlightMode) {
+        wordEl.innerText = current.word;
+        return;
+    }
 
     let tempWord = current.word;
-    // Сортируем правила: сначала длинные строки, потом Regex, потом короткие строки
+
     const sortedRules = [...phoneticRules].sort((a, b) => {
         let lenA = (a.p instanceof RegExp) ? 1.5 : a.p.length;
         let lenB = (b.p instanceof RegExp) ? 1.5 : b.p.length;
         return lenB - lenA;
     });
 
-    // Создаем общую регулярку
-    const combinedRegex = new RegExp(sortedRules.map(r => (r.p instanceof RegExp ? r.p.source : r.p)).join('|'), 'gi');
+const combinedRegex = new RegExp(
+    sortedRules.map(r =>
+        r.p instanceof RegExp ? r.p.source : r.p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    ).join('|'),
+    'gi'
+);
 
     wordEl.innerHTML = tempWord.replace(combinedRegex, (match, offset) => {
         const rule = sortedRules.find(r => {
@@ -215,17 +286,9 @@ function renderWord() {
             }
             return r.p.toLowerCase() === match.toLowerCase();
         });
+
         return `<span class="hl" data-sound="${rule ? rule.s : ''}">${match}</span>`;
     });
-}
-
-function getRandomWord() {
-    current = words[Math.floor(Math.random() * words.length)];
-    renderWord();
-    document.getElementById("translation").innerText = current.translation;
-    document.getElementById("transcription").innerText = "";
-    document.getElementById("showBtn").style.display = "inline-block";
-    document.getElementById("speaker").style.display = "inline-block";
 }
 
 function showTranscription() { if (current) document.getElementById("transcription").innerText = current.transcription; }
@@ -240,9 +303,74 @@ function speakWord() {
 }
 
 window.onclick = function(e) {
-    if (e.target.classList.contains('modal')) {
-        e.target.style.display = 'none';
-    }
+    if (e.target.id === 'rulesModal') toggleModal(false);
+    if (e.target.id === 'settingsModal') toggleSettings(false);
+    if (e.target.id === 'grammarRulesModal') toggleGrammarRules(false);
 }
 
-input.classList.add("correct");
+
+function toggleMode() {
+    mode = mode === 'words' ? 'sentences' : 'words';
+
+    const label = document.getElementById("modeLabel");
+
+    if (mode === 'words') {
+        label.innerText = "🇫🇷 Слова";
+    } else {
+        label.innerText = "🇫🇷 Предложения";
+    }
+
+    getRandomWord();
+}
+
+function openSettings() {
+    toggleSettings(true);
+}
+
+function toggleSettings(show) {
+    document.getElementById('settingsModal').style.display = show ? 'block' : 'none';
+}
+
+function applySettings() {
+    settings.showTranslation = document.getElementById("toggleTranslation").checked;
+    settings.autoTranscription = document.getElementById("toggleTranscription").checked;
+    settings.autoHighlight = document.getElementById("toggleHighlight").checked;
+    settings.filterSound = document.getElementById("soundFilter").value || null;
+
+    isHighlightMode = settings.autoHighlight;
+
+    const hlBtn = document.getElementById("hlBtn");
+    hlBtn.classList.toggle("active", isHighlightMode);
+
+    if (current) renderWord();
+saveSettings();
+getRandomWord();
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("toggleTranslation").onchange = applySettings;
+    document.getElementById("toggleTranscription").onchange = applySettings;
+    document.getElementById("toggleHighlight").onchange = applySettings;
+
+    loadSettings();
+});
+
+function saveSettings() {
+    localStorage.setItem("frSettings", JSON.stringify(settings));
+}
+
+function loadSettings() {
+    const saved = localStorage.getItem("frSettings");
+
+    if (saved) {
+        settings = JSON.parse(saved);
+    }
+
+    // применяем в UI
+    document.getElementById("toggleTranslation").checked = settings.showTranslation;
+    document.getElementById("toggleTranscription").checked = settings.autoTranscription;
+    document.getElementById("toggleHighlight").checked = settings.autoHighlight;
+    document.getElementById("soundFilter").value = settings.filterSound || "";
+
+    isHighlightMode = settings.autoHighlight;
+}

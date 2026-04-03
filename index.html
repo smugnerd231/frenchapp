@@ -26,21 +26,27 @@
     <!-- ФОНЕТИКА -->
     <div id="phoneticsSection">
         <button class="btn-rules" onclick="toggleModal(true)">📖 Правила</button>
-        <h1>🇫🇷 Фонетика</h1>
+<div class="top-bar">
+    <div class="mode-switch" onclick="toggleMode()">
+        <span id="modeLabel">🇫🇷 Слова</span>
+    </div>
 
-        <div class="btn-group">
-            <button onclick="getRandomWord()">Новое слово</button>
-            <button id="hlBtn" onclick="toggleHighlightMode()">Подсветка</button>
-        </div>
+    <div class="settings-btn" onclick="openSettings()">
+        ⚙️
+    </div>
+</div>
+     <div class="btn-group">
+    <button onclick="getRandomWord()">Новое слово</button>
+    <button id="hlBtn" onclick="toggleLearningMode()">Транскрипция</button>
+</div>
 
         <div class="word-container">
             <div id="word" class="word"></div>
             <div id="speaker" onclick="speakWord()">🔊</div>
         </div>
 
-        <div id="translation"></div>
-        <button id="showBtn" onclick="showTranscription()">Показать транскрипцию</button>
-        <div id="transcription"></div>
+       <div id="translation" class="translation"></div>
+               <div id="transcription" class="transcription"></div>
     </div>
 
     <!-- ГРАММАТИКА -->
@@ -66,14 +72,13 @@
     <button class="tab" onclick="setTense('future', this)">Будущее</button>
 </div>
 
-<button onclick="toggleMode()">Сменить режим</button>
+<button onclick="toggleGrammarMode()">Сменить режим</button>
     <button onclick="getVerb()">Новый глагол</button>
 
 <div id="verbContainer">
     <div id="verb"></div>
     <div id="verbSpeaker" onclick="speakVerb()">🔊</div>
-</div>    <div id="verb" style="margin:15px; font-size:22px;"></div>
-
+</div>   
     <div id="inputs"></div>
 
 <button id="showBtnGrammar" onclick="showAnswer()">Показать ответ</button>
@@ -186,6 +191,8 @@
             <div class="rule-item"><b>ɔ̃</b> (<code>on, om</code>) – мычать открытрым ртом, произнося <i>ɔ</i>.</div>
                        <div class="rule-item"><b>ɲ</b> (<code>gn</code>) – как в слове «осенью». <b>Ien</b> → <i></div>
 </div>
+</div>
+</div>
 
    <script src="phonetics.js"></script>
     <script src="grammar.js"></script>
@@ -204,6 +211,48 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js');
 }
 </script>
+
+<div id="settingsModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="toggleSettings(false)">&times;</span>
+
+        <h2>⚙️ Настройки</h2>
+
+        <div class="setting-item">
+            <label>
+                <input type="checkbox" id="toggleTranslation" checked>
+                Показывать перевод
+            </label>
+        </div>
+
+        <div class="setting-item">
+            <label>
+                <input type="checkbox" id="toggleTranscription">
+                Авто-показывать транскрипцию
+            </label>
+        </div>
+
+        <div class="setting-item">
+            <label>
+                <input type="checkbox" id="toggleHighlight">
+                Подсветка по умолчанию
+            </label>
+        </div>
+
+<div class="setting-item">
+    <label>Фильтр звука:</label>
+    <select id="soundFilter">
+        <option value="">Все</option>
+        <option value="ɑ̃">ɑ̃</option>
+        <option value="ɛ̃">ɛ̃</option>
+        <option value="ɔ̃">ɔ̃</option>
+        <option value="ʁ">ʁ</option>
+        <option value="u">u</option>
+    </select>
+</div>
+
+    </div>
+</div>
 
 </body>
 </html>

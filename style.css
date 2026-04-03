@@ -250,3 +250,49 @@ background: #f8f9fa;
     cursor: pointer;
     display: none;
 }
+
+
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.mode-switch {
+    background: #f1f3f5;
+    padding: 8px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: 0.2s;
+}
+
+.mode-switch:hover {
+    background: #e0e0e0;
+}
+
+.settings-btn {
+    font-size: 20px;
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 10px;
+    transition: 0.2s;
+}
+
+.settings-btn:hover {
+    background: #f1f1f1;
+}
+
+.setting-item {
+    margin: 15px 0;
+    font-size: 16px;
+}
+
+.setting-item input {
+    margin-right: 8px;
+    transform: scale(1.2);
+}
+
+#rulesModal { z-index: 1000; }
+#settingsModal { z-index: 2000; }
