@@ -296,3 +296,34 @@ background: #f8f9fa;
 
 #rulesModal { z-index: 1000; }
 #settingsModal { z-index: 2000; }
+
+
+.word-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.badge {
+    position: absolute;
+    top: -5px;
+    left: -10px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.badge.f {
+    background: red;
+}
+
+.badge.m {
+    background: blue;
+}
+
+.badge.ex {
+    background: orange;
+    color: white;
+    font-size: 8px;
+    text-align: center;
+    line-height: 10px;
+}

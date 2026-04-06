@@ -56,9 +56,10 @@ const words = [
 
 // ДОПОЛНИТЕЛЬНЫЕ
 
-{word:"maison",translation:"дом",transcription:"[mɛzɔ̃]"},
+{word:"maison",translation:"дом",transcription:"[mɛzɔ̃]", gender: "f"},
 {word:"homme",translation:"мужчина",transcription:"[ɔm]"},
-{word:"femme",translation:"женщина",transcription:"[fam]"},
+{word:"femme",translation:"женщина",transcription:"[fam]", phonemes: [
+    { text: "fe", sound: "f" }, { text: "mme", sound: "am" } ], exception: true},
 {word:"enfant",translation:"ребёнок",transcription:"[ɑ̃fɑ̃]"},
 {word:"temps",translation:"время",transcription:"[tɑ̃]"},
 {word:"jour",translation:"день",transcription:"[ʒuʁ]"},
@@ -147,29 +148,50 @@ const words = [
 {word:"essayer",translation:"примерить",transcription:"[eseje]"},
 {word:"long",translation:"длинный",transcription:"[lɔ̃]"}
 ];
+
 // Правила: 'p' - паттерн, 's' - звук
 const phoneticRules = [
-    { p: 'ien', s: 'jẽ' }, { p: 'emm', s: 'a' }, { p: 'enn', s: 'a' },
-    { p: 'eau', s: 'o' }, { p: 'ueu', s: 'ɥ' }, { p: 'ain', s: 'ɛ̃' },
-    { p: 'aim', s: 'ɛ̃' }, { p: 'ein', s: 'ɛ̃' }, { p: 'oin', s: 'w' },
-    { p: 'ill', s: 'j' }, { p: 'au', s: 'o' }, { p: 'ai', s: 'ɛ' },
-    { p: 'ei', s: 'ɛ' }, { p: 'ui', s: 'ɥ' }, { p: 'ue', s: 'ɥ' },
-    { p: 'ua', s: 'ɥ' }, { p: 'ou', s: 'u' }, { p: 'oi', s: 'w' },
-    { p: 'in', s: 'ɛ̃' }, { p: 'im', s: 'ɛ̃' }, { p: 'un', s: 'œ̃' },
-    { p: 'um', s: 'œ̃' }, { p: 'on', s: 'ɔ̃' }, { p: 'om', s: 'ɔ̃' },
-    { p: 'an', s: 'ɑ̃' }, { p: 'am', s: 'ɑ̃' }, { p: 'en', s: 'ɑ̃' },
-    { p: 'em', s: 'ɑ̃' }, { p: 'er', s: 'e' }, { p: 'es', s: 'e' },
-    { p: 'ez', s: 'e' }, { p: 'é', s: 'e' }, { p: 'è', s: 'ɛ' },
-    { p: 'ê', s: 'ɛ' }, { p: 'â', s: 'a' }, { p: 'ô', s: 'o' },
-    { p: 'ch', s: 'ʃ' }, { p: 'gn', s: 'ɲ' }, { p: 'ç', s: 's' },
-    { p: 'u', s: 'у' },
-    // Умные правила (Regex):
-    { p: /i(?=[aeiouyâêîôû])/gi, s: 'j' }, // i перед гласной
-    { p: /c(?=[eiy])/gi, s: 's' }, // c перед e, i, y
-    { p: /g(?=[eiy])/gi, s: 'ʒ' }, // g перед e, i, y
-    // Просто выделение:
-    { p: 'eu', s: '' }, { p: 'œu', s: '' }, { p: 'œ', s: '' }
+    // НОСОВЫЕ (самые приоритетные)
+    { p: 'oin', s: 'wɛ̃' },
+    { p: 'ien', s: 'jɛ̃' },
+    { p: 'ain', s: 'ɛ̃' },
+    { p: 'aim', s: 'ɛ̃' },
+    { p: 'ein', s: 'ɛ̃' },
+    { p: 'in', s: 'ɛ̃' },
+    { p: 'im', s: 'ɛ̃' },
+    { p: 'un', s: 'œ̃' },
+    { p: 'on', s: 'ɔ̃' },
+    { p: 'an', s: 'ɑ̃' },
+    { p: 'en', s: 'ɑ̃' },
+
+    // ДИФТОНГИ
+    { p: 'eau', s: 'o' },
+    { p: 'au', s: 'o' },
+    { p: 'ai', s: 'ɛ' },
+    { p: 'ei', s: 'ɛ' },
+    { p: 'oi', s: 'wa' }, // ✔️ исправлено
+
+    // СПЕЦ
+    { p: 'ill', s: 'j' },
+    { p: 'gn', s: 'ɲ' },
+    { p: 'ch', s: 'ʃ' },
+
+    // ОКОНЧАНИЯ (ВАЖНО)
+    { p: /er\b/gi, s: 'e' },
+    { p: /ez\b/gi, s: 'e' },
+    { p: /ent\b/gi, s: '' },
+
+    // БУКВЫ
+    { p: 'é', s: 'e' },
+    { p: 'è', s: 'ɛ' },
+    { p: 'ê', s: 'ɛ' },
+
+    // КОНТЕКСТ
+    { p: /c(?=[eiy])/gi, s: 's' },
+    { p: /g(?=[eiy])/gi, s: 'ʒ' },
+    { p: /i(?=[aeiouy])/gi, s: 'j' }
 ];
+
 
 const sentences = [
     {
@@ -188,13 +210,24 @@ let settings = {
     showTranslation: true,
     autoTranscription: false,
     autoHighlight: false,
-    filterSound: null
+    filterSound: null,
+    useProgress: true,
+    wordMode: "all",
+    ankiMode: false
 };
+
 
 let mode = 'words'; // words | sentences
 
 let current = null;
 let isHighlightMode = false;
+
+let progress = {
+  learned: [],
+  difficult: []
+};
+
+let seenWords = {};
 
 function toggleModal(show) { document.getElementById('rulesModal').style.display = show ? 'block' : 'none'; }
 
@@ -218,12 +251,24 @@ function toggleLearningMode() {
 function getRandomWord() {
     let source = mode === 'words' ? words : sentences;
 
+if (mode === 'words' && settings.useProgress) {
+
+    if (settings.wordMode === "learned") {
+        source = source.filter(w => progress.learned.includes(w.word));
+    }
+
+    if (settings.wordMode === "new") {
+        source = source.filter(w => !progress.learned.includes(w.word));
+    }
+}
+
     // фильтр
     if (settings.filterSound) {
         source = source.filter(item =>
             item.transcription && item.transcription.includes(settings.filterSound)
         );
     }
+
 
     // если ничего не найдено
     if (source.length === 0) {
@@ -238,8 +283,12 @@ function getRandomWord() {
     renderWord();
 
     const translationEl = document.getElementById("translation");
+if (settings.ankiMode) {
+    translationEl.innerText = "";
+} else {
     translationEl.innerText = current.translation;
     translationEl.style.display = settings.showTranslation ? "block" : "none";
+}
 
     const transcriptionEl = document.getElementById("transcription");
 
@@ -251,44 +300,97 @@ function getRandomWord() {
 
 
     document.getElementById("speaker").style.display = "inline-block";
+
+if (!seenWords[current.word]) {
+    seenWords[current.word] = 0;
+}
+seenWords[current.word]++;
+
+if (seenWords[current.word] === 3) {
+    setTimeout(() => {
+        let answer = prompt("Перевод слова: " + current.word);
+
+        if (answer && answer.toLowerCase() === current.translation.toLowerCase()) {
+            markLearned();
+            alert("✅ Верно! Слово выучено");
+        } else {
+            alert("❌ Ошибка");
+        }
+    }, 300);
+}
 }
 
     function renderWord() {
     const wordEl = document.getElementById("word");
-
     if (!current) return;
 
-    if (!isHighlightMode) {
-        wordEl.innerText = current.word;
-        return;
+    // 🔥 1. если есть phonemes → используем их
+    if (current.phonemes) {
+        wordEl.innerHTML = current.phonemes.map(p =>
+            `<span class="hl" data-sound="${p.sound}">${p.text}</span>`
+        ).join('');
     }
 
-    let tempWord = current.word;
+    // 🔥 2. иначе обычная логика
+    else if (isHighlightMode) {
+        let tempWord = current.word;
 
-    const sortedRules = [...phoneticRules].sort((a, b) => {
-        let lenA = (a.p instanceof RegExp) ? 1.5 : a.p.length;
-        let lenB = (b.p instanceof RegExp) ? 1.5 : b.p.length;
-        return lenB - lenA;
-    });
-
-const combinedRegex = new RegExp(
-    sortedRules.map(r =>
-        r.p instanceof RegExp ? r.p.source : r.p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-    ).join('|'),
-    'gi'
-);
-
-    wordEl.innerHTML = tempWord.replace(combinedRegex, (match, offset) => {
-        const rule = sortedRules.find(r => {
-            if (r.p instanceof RegExp) {
-                const test = new RegExp('^' + r.p.source, 'i');
-                return test.test(tempWord.substring(offset));
-            }
-            return r.p.toLowerCase() === match.toLowerCase();
+        const sortedRules = [...phoneticRules].sort((a, b) => {
+            let lenA = (a.p instanceof RegExp) ? 1.5 : a.p.length;
+            let lenB = (b.p instanceof RegExp) ? 1.5 : b.p.length;
+            return lenB - lenA;
         });
 
-        return `<span class="hl" data-sound="${rule ? rule.s : ''}">${match}</span>`;
-    });
+        const combinedRegex = new RegExp(
+            sortedRules.map(r =>
+                r.p instanceof RegExp ? r.p.source : r.p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+            ).join('|'),
+            'gi'
+        );
+
+        let used = Array(tempWord.length).fill(false);
+
+        wordEl.innerHTML = tempWord.replace(combinedRegex, (match, offset) => {
+
+            for (let i = 0; i < match.length; i++) {
+                if (used[offset + i]) return match;
+            }
+
+            for (let i = 0; i < match.length; i++) {
+                used[offset + i] = true;
+            }
+
+            const rule = sortedRules.find(r => {
+                if (r.p instanceof RegExp) {
+                    const test = new RegExp('^' + r.p.source, 'i');
+                    return test.test(tempWord.substring(offset));
+                }
+                return r.p.toLowerCase() === match.toLowerCase();
+            });
+
+            return `<span class="hl" data-sound="${rule ? rule.s : ''}">${match}</span>`;
+        });
+    }
+
+    // 🔥 3. без подсветки
+    else {
+        wordEl.innerText = current.word;
+    }
+
+    // 🔥 4. добавляем значки
+   let badges = "";
+
+if (current.gender === "f") {
+    badges += `<span class="badge f"></span>`;
+}
+if (current.gender === "m") {
+    badges += `<span class="badge m"></span>`;
+}
+if (current.exception) {
+    badges += `<span class="badge ex">!</span>`;
+}
+
+wordEl.innerHTML = `<div class="word-wrapper">${badges}${wordEl.innerHTML}</div>`;
 }
 
 function showTranscription() { if (current) document.getElementById("transcription").innerText = current.transcription; }
@@ -336,6 +438,9 @@ function applySettings() {
     settings.autoTranscription = document.getElementById("toggleTranscription").checked;
     settings.autoHighlight = document.getElementById("toggleHighlight").checked;
     settings.filterSound = document.getElementById("soundFilter").value || null;
+settings.useProgress = document.getElementById("useProgress").checked;
+settings.wordMode = document.getElementById("wordMode").value;
+settings.ankiMode = document.getElementById("ankiMode").checked;
 
     isHighlightMode = settings.autoHighlight;
 
@@ -351,7 +456,9 @@ window.addEventListener("DOMContentLoaded", () => {
     document.getElementById("toggleTranslation").onchange = applySettings;
     document.getElementById("toggleTranscription").onchange = applySettings;
     document.getElementById("toggleHighlight").onchange = applySettings;
-
+document.getElementById("useProgress").onchange = applySettings;
+document.getElementById("wordMode").onchange = applySettings;
+document.getElementById("ankiMode").onchange = applySettings;
     loadSettings();
 });
 
@@ -371,6 +478,98 @@ function loadSettings() {
     document.getElementById("toggleTranscription").checked = settings.autoTranscription;
     document.getElementById("toggleHighlight").checked = settings.autoHighlight;
     document.getElementById("soundFilter").value = settings.filterSound || "";
+document.getElementById("useProgress").checked = settings.useProgress ?? true;
+document.getElementById("wordMode").value = settings.wordMode || "all";
+document.getElementById("ankiMode").checked = settings.ankiMode ?? false;
 
     isHighlightMode = settings.autoHighlight;
+}
+
+
+function parsePhonemes(str) {
+    if (!str) return null;
+
+    return str.split(',').map(p => {
+        const [text, sound] = p.split(':');
+        return { text, sound };
+    });
+}
+
+function saveProgress() {
+    localStorage.setItem("frProgress", JSON.stringify(progress));
+}
+
+function loadProgress() {
+    const saved = localStorage.getItem("frProgress");
+    if (saved) progress = JSON.parse(saved);
+}
+
+function markLearned() {
+    if (!progress.learned.includes(current.word)) {
+        progress.learned.push(current.word);
+        saveProgress();
+    }
+}
+
+function showLearned() {
+    alert(progress.learned.join("\n"));
+}
+
+
+document.getElementById("fileInput").addEventListener("change", handleFile);
+
+function handleFile(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = function(evt) {
+        const text = evt.target.result;
+
+        // простой CSV вариант
+        const rows = text.split("\n");
+
+        words = rows.map(r => {
+            const [word, translation, transcription] = r.split(",");
+
+            return {
+                word,
+                translation,
+                transcription
+            };
+        });
+
+        alert("Файл загружен!");
+    };
+
+    reader.readAsText(file);
+}
+
+function showLearned() {
+    const el = document.getElementById("progressList");
+
+    if (progress.learned.length === 0) {
+        el.innerHTML = "Пока ничего не выучено";
+        return;
+    }
+
+    el.innerHTML = progress.learned
+        .map(w => `<div>${w}</div>`)
+        .join('');
+}
+
+function resetProgress() {
+    if (!confirm("Удалить весь прогресс?")) return;
+
+    progress = { learned: [], difficult: [] };
+    localStorage.removeItem("frProgress");
+
+    alert("Прогресс сброшен");
+}
+
+function revealAnswer() {
+    if (!current) return;
+
+    document.getElementById("translation").innerText = current.translation;
 }
